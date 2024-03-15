@@ -1,0 +1,56 @@
+--BOR--	<specification>	::=	<definition>+ --EOR--
+
+
+--BOR--	<definition>  ::=	<type_dcl> ";"
+
+
+
+ 		|	<const_dcl> ";"
+
+
+
+ 		|	<except_dcl> ";"
+
+
+
+ 		|	<interface> ";"
+
+
+
+ 		|	<module> ";" --EOR--
+
+
+
+--BOR--	<module>	::=	"module" <identifier>
+
+
+
+ 				"{" <definition>+ "}" --EOR--
+
+
+
+--BOR--	<interface>	::=	<interface_dcl>
+
+
+
+ 		|	<forward_dcl> --EOR--
+
+
+
+--BOR--	<interface_dcl>	::=	<interface_header>
+
+
+
+ 				"{" <interface-body> "}" --EOR--
+
+
+
+--BOR--	<forward_dcl>	::=	"interface" <identifier> --EOR--
+
+
+
+--BOR--	<interface_header>	::=	"interface" <identifier>
+
+
+
+ 				[<inheritance_spec>] --EOR--

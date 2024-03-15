@@ -1,0 +1,639 @@
+--BOR--	<specification>	::=	<definition>+ --EOR--
+
+
+--BOR--	<definition>  ::=	<type_dcl> ";"
+
+
+
+ 		|	<const_dcl> ";"
+
+
+
+ 		|	<except_dcl> ";"
+
+
+
+ 		|	<interface> ";"
+
+
+
+ 		|	<module> ";" --EOR--
+
+
+
+--BOR--	<module>	::=	"module" <identifier>
+
+
+
+ 				"{" <definition>+ "}" --EOR--
+
+
+
+--BOR--	<interface>	::=	<interface_dcl>
+
+
+
+ 		|	<forward_dcl> --EOR--
+
+
+
+--BOR--	<interface_dcl>	::=	<interface_header>
+
+
+
+ 				"{" <interface-body> "}" --EOR--
+
+
+
+--BOR--	<forward_dcl>	::=	"interface" <identifier> --EOR--
+
+
+
+--BOR--	<interface_header>	::=	"interface" <identifier>
+
+
+
+ 				[<inheritance_spec>] --EOR--
+
+
+
+--BOR--	<interface_body>	::=	<export>* --EOR--
+
+
+
+--BOR--	<export>	::=	<type_dcl> ";"
+
+
+
+ 		|	<const_dcl> ";"
+
+
+
+ 		|	<except_dcl> ";"
+
+
+
+ 		|	<attr_dcl> ";"
+
+
+
+ 		|	<op_dcl> ";" --EOR--
+
+
+
+--BOR--	<inheritance_spec>	::=	":" <scoped_name> {"," <scoped_name>}* --EOR--
+
+
+
+--BOR--	<scoped_name>	::=	<identifier>
+
+
+
+ 		|	"::" <identifier>
+
+
+
+ 		|	<scoped_name> "::" <identifier> --EOR--
+
+
+
+--BOR--	<const_dcl>	::=	"const" <const_type> <identifier>
+
+
+
+ 				 "="<const_exp> --EOR--
+
+
+
+--BOR--	<const_type>	::=	<integer_type>
+
+
+
+ 		|	<char_type>
+
+
+
+ 		|	<boolean_type>
+
+
+
+ 		|	<floating_pt_type>
+
+
+
+ 		|	<string_type>
+
+
+
+ 		|	<scoped_name> --EOR--
+
+
+--BOR--	<const_exp>	::=	<or_expr> --EOR--
+
+
+
+--BOR--	<or_expr>	::=	<xor_expr>
+
+
+
+ 		|	<or_expr> "|" <xor_expr> --EOR--
+
+
+
+--BOR--	<xor_expr>	::=	<and_expr>
+
+
+
+ 		|	<xor_expr> "^" <and_expr> --EOR--
+
+
+
+--BOR--	<and_expr>	::=	<shift_expr>
+
+
+
+ 		|	<and_expr> "&" <shift_expr> --EOR--
+
+
+
+--BOR--	<shift_expr>	::=	<add_expr>
+
+
+
+ 		|	<shift_expr> ">>"<add_expr>
+
+
+
+ 		|	<shift_expr> "<<"<add_expr> --EOR--
+
+
+--BOR--	<add_expr>	::=	<mult_expr>
+
+
+
+ 		|	<add_expr> "+" <mult_expr>
+
+
+
+ 		|	<add_expr> "-" <mult_expr> --EOR--
+
+
+
+--BOR--	<mult_expr>	::=	<unary_expr>
+
+
+
+ 		|	<mult_expr> "*" <unary_expr>
+
+
+
+ 		|	<mult_expr> "/" <unary_expr>
+
+
+
+ 		|	<mult_expr> "%" <unary_expr> --EOR--
+
+
+
+--BOR--	<unary_expr>	::=	<unary_operator> <primary_expr>
+
+
+
+ 		|	<primary_expr> --EOR--
+
+
+
+--BOR--	<unary_operator>	::=	"-"
+
+
+
+ 		|	"+"
+
+
+
+ 		|	"~" --EOR--
+
+
+
+--BOR--	<primary_expr>	::=	<scoped_name>
+
+
+
+ 		|	<literal>
+
+
+
+ 		|	"(" <const_exp> ")" --EOR--
+
+
+
+--BOR--	<literal>	::=	<integer_literal>
+
+
+
+ 		|	<string_literal>
+
+
+
+ 		|	<character_literal>
+
+
+
+ 		|	<floating_pt_literal>
+
+
+
+ 		|	<boolean_literal> --EOR--
+
+
+
+--BOR--	<boolean_literal>	::=	"TRUE"
+
+
+
+ 		|	"FALSE" --EOR--
+
+
+
+--BOR--	<positive_int_const>	::=	<const_exp> --EOR--
+
+
+
+--BOR--	<type_dcl>	::=	"typedef" <type_declarator>
+
+
+
+ 		|	<struct_type>
+
+
+
+ 		|	<union_type>
+
+
+
+ 		|	<enum_type> --EOR--
+
+
+
+--BOR--	<type_declarator>	::=	<type_spec> <declarators> --EOR--
+
+
+
+--BOR--	<type_spec>	::=	<simple_type_spec>
+
+
+
+ 		|	<constr_type_spec> --EOR--
+
+
+
+--BOR--	<simple_type_spec>	::=	<base_type_spec>
+
+
+
+ 		|	<template_type_spec>
+
+
+
+ 		|	<scoped_name> --EOR--
+
+
+--BOR--	<base_type_spec>	::=	<floating_pt_type>
+
+
+
+ 		|	<integer_type>
+
+
+
+ 		|	<char_type>
+
+
+
+ 		|	<boolean_type>
+
+
+
+ 		|	<octet_type>
+
+
+
+ 		|	<any_type> --EOR--
+
+
+
+--BOR--	<template_type_spec>	::=	<sequence_type>
+
+
+
+ 		|	<string_type> --EOR--
+
+
+
+--BOR--	<constr_type_spec>	::=	<struct_type>
+
+
+
+ 		|	<union_type>
+
+
+
+ 		|	<enum_type> --EOR--
+
+
+
+--BOR--	<declarators>	::=	<declarator> { "," <declarator> }* --EOR--
+
+
+
+--BOR--	<declarator>	::=	<simple_declarator>
+
+
+
+ 		|	<complex_declarator> --EOR--
+
+
+
+--BOR--	<simple_declarator>	::=	<identifier> --EOR--
+
+
+
+--BOR--	<complex_declarator>	::=	<array_declarator> --EOR--
+
+
+
+--BOR--	<floating_pt_type>	::=	"float"
+
+
+
+ 		|	"double" --EOR--
+
+
+
+--BOR--	<integer_type>	::=	<signed_int>
+
+
+
+ 		|	<unsigned_int> --EOR--
+
+
+
+--BOR--	<signed_int>	::=	<signed_long_int>
+
+
+
+ 		|	<signed_short_int> --EOR--
+
+
+
+--BOR--	<signed_long_int>	::=	"long" --EOR--
+
+
+
+--BOR--	<signed_short_int>	::=	"short" --EOR--
+
+
+
+--BOR--	<unsigned_int>	::=	<unsigned_long_int>
+
+
+
+ 		|	<unsigned_short_int> --EOR--
+
+
+
+--BOR--	<unsigned_long_int>	::=	"unsigned" "long" --EOR--
+
+
+--BOR--	<unsigned_short_int>	::=	"unsigned" "short" --EOR--
+
+
+
+--BOR--	<char_type>	::=	"char" --EOR--
+
+
+
+--BOR--	<boolean_type>	::=	"boolean" --EOR--
+
+
+
+--BOR--	<octet_type>	::=	"octet" --EOR--
+
+
+
+--BOR--	<any_type>	::=	"any" --EOR--
+
+
+
+--BOR--	<struct_type>	::=	"struct" <identifier>
+
+
+
+ 				 "{" <member_list> "}" --EOR--
+
+
+
+--BOR--	<member_list>	::=	<member>+ --EOR--
+
+
+
+--BOR--	<member>	::=	<type_spec> <declarators> ";" --EOR--
+
+
+
+--BOR--	<union_type>	::=	"union" <identifier> "switch"
+
+
+
+ 				"(" <switch_type_spec> ")"
+
+
+
+ 				"{" <switch_body> "}" --EOR--
+
+
+
+--BOR--	<switch_type_spec>	::=	<integer_type>
+
+
+
+ 		|	<char_type>
+
+
+
+ 		|	<boolean_type>
+
+
+
+ 		|	<enum_type>
+
+
+
+ 		|	<scoped_name> --EOR--
+
+
+
+--BOR--	<switch_body>	::=	<case>+ --EOR--
+
+
+
+--BOR--	<case>	::=	<case_label>+ <element_spec> ";" --EOR--
+
+
+
+--BOR--	<case_label>	::=	"case" <const_exp> ":"
+
+
+
+ 		|	"default" ":" --EOR--
+
+
+
+--BOR--	<element_spec>	::=	<type_spec> <declarator> --EOR--
+
+
+
+--BOR--	<enum_type>	::=	"enum" <identifier> "{" <enumerator>
+
+
+
+ 				{ "," <enumerator> }* "}" --EOR--
+
+
+
+--BOR--	<enumerator>	::=	<identifier> --EOR--
+
+
+
+--BOR--	<sequence_type>	::=	"sequence" "<" <simple_type_spec>
+
+
+
+ 				"," <positive_int_const> ">"
+
+
+
+ 		|	"sequence" "<" <simple_type_spec> ">" --EOR--
+
+
+
+--BOR--	<string_type>	::=	"string" "<" <positive_int_const> ">"
+
+
+
+ 		|	"string" --EOR--
+
+
+
+--BOR--	<array_declarator>	::=	<identifier> <fixed_array_size>+ --EOR--
+
+
+
+--BOR--	<fixed_array_size>	::=	"[" <positive_int_const> "]" --EOR--
+
+
+
+--BOR--	<attr_dcl>	::=	["readonly"] "attribute"
+
+
+
+ 				<param_type_spec>
+
+
+
+ 				<simple_declarator>
+
+
+
+ 				{","<simple_declarator>}* --EOR--
+
+
+
+--BOR--	<except_dcl>	::=	"exception" <identifier>
+
+
+
+ 				 "{" <member>* "}" --EOR--
+
+
+
+--BOR--	<op_dcl>	::=	[<op_attribute>] <op_type_spec>
+
+
+
+  				<identifier>
+
+
+
+ 				<parameter_dcls>
+
+
+
+ 				[<raises_expr>] [<context_expr>] --EOR--
+
+
+
+--BOR--	<op_attribute>	::=	"oneway" --EOR--
+
+
+
+--BOR--	<op_type_spec>	::=	<param_type_spec>
+
+
+
+ 		|	"void" --EOR--
+
+
+
+--BOR--	<parameter_dcls>	::=	"(" <param_dcl> {"," <param_dcl>}* ")"
+
+
+
+ 		|	"(" ")" --EOR--
+
+
+
+--BOR--	<param_dcl>	::=	<param_attribute> <param_type_spec>
+
+
+
+ 				<simple_declarator> --EOR--
+
+
+
+--BOR--	<param_attribute>	::=	"in"
+
+
+
+ 		|	"out"
+
+
+
+ 		|	"inout" --EOR--
+
+
+
+--BOR--	<raises_expr>	::=	"raises" "(" <scoped_name>
+
+
+
+ 				{ "," <scoped_name> }* ")" --EOR--
+
+
+
+--BOR--	<context_expr>	::=	"context" "(" <string_literal>
+
+
+
+ 				{ "," <string_literal>}* ")" --EOR--
+
+
+
+--BOR-- <param_type_spec>		::=	<base_type_spec> <string_type>
+
+
+
+ 			<scoped_name> --EOR--
+
+
+

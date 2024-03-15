@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Deps: org.clojure/tools.trace:0.7.11">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/clojure/tools.trace/0.7.11/tools.trace-0.7.11.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
