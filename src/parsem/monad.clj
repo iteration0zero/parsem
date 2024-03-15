@@ -58,7 +58,6 @@
           (bind m
             (a s)
             (fn [[v s']]
-              (prn "v s'" v s')
               ((f v) s')))
           (zero m))))
     IMonadZeroPlus

@@ -254,24 +254,24 @@
                   (g->types type-grammar)
                   (g->types grammar-grammar)
                   (g->types parser-grammar))]
-    (def p1 (p/applyp (p/typep ts)
+
+    (def p1 (p/type->p ts
               [:type/type]))
     (def p2 (p/type->p ts
               [:parser/parser]))
-    (p1 [:type/type])
-    #_((ffirst ((mlet [[:v (fn [_] p1)]
-                       [:v (fn [{:keys [v]}]
-                             (p/applyp p2 v))]
-                       [:v (fn [{:keys [v]}]
-                             (p/applyp (p/typep ts) v))]
-                       [:v (fn [{:keys [v]}]
-                             v)]
-                       [:p (fn [{:keys [v]}]
-                             (p/applyp (p/typep ts) v))]]
-                  (fn [{:keys [p]}]
-                    (munit p)))
-                [:type/type]))
-       [:parser/parser])))
+    ((ffirst ((mlet [[:v (fn [_] p1)]
+                     [:v (fn [{:keys [v]}]
+                           (p/applyp p2 v))]
+                     [:v (fn [{:keys [v]}]
+                           (p/applyp (p/typep ts) v))]
+                     [:v (fn [{:keys [v]}]
+                           v)]
+                     [:p (fn [{:keys [v]}]
+                           (p/applyp (p/typep ts) v))]]
+                (fn [{:keys [p]}]
+                  (munit p)))
+              [:type/type]))
+     [:parser/parser])))
 
 
 

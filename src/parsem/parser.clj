@@ -5,6 +5,11 @@
 ;; PARSERS                                               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn empty-check [f]
+    (fn [s]
+        (if (not (empty? s))
+            (f s))))
+
 ;; Takes a parser and an input sequence
 ;; and returns a parser which uses the monadic state operations mfetch and mset
 ;; to temporarily set the state to the specified input sequence,
@@ -23,7 +28,7 @@
 
 ;; A parser which consumes one item of an input sequence.
 (def pitem
-  (mbind (update-s rest)
+  (mbind (update-s (empty-check rest))
          (comp munit first)))
 
 ;; A parser which checks if an item is contained in a set.
