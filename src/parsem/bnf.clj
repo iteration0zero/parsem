@@ -4,123 +4,123 @@
             [parsem.setup :refer :all]))
 
 (def bnf-g
-  {:bnf/alpha [:pred
+  {:bnf/alpha [:base/pred
                (into #{}
                  (map char (range 65 123)))]
-   :bnf/num [:pred
+   :bnf/num [:base/pred
              (into #{}
                (map char (range 48 57)))]
-   :space [:pred
+   :space [:base/pred
            #{\space}]
-   :tab [:pred
+   :tab [:base/pred
           #{\tab}]
-   :newline [:pred
+   :newline [:base/pred
              #{\newline}]
-   :bnf/alphanum [:prod
+   :bnf/alphanum [:c/prod
                   [:bnf/alpha]
-                  [:list
-                   [:sum
+                  [:c/list
+                   [:c/sum
                     [:bnf/alpha]
                     [:bnf/num]]]]
-   :bnf/ascii [:pred
+   :bnf/ascii [:base/pred
                (into #{}
                  (concat (map char (range 65 123))
                          (map char (range 48 57))
                          [\! \? \. \, \- \_ \; \: \= \& \( \) \{ \} \[ \]]))]
-   :bnf/asciie [:pred
+   :bnf/asciie [:base/pred
                 (into #{}
                   (concat (map char (range 65 123))
                           (map char (range 48 57))
                           [\! \? \. \, \- \_ \; \: \= \& \( \) \{ \} \[ \| \| \< \> \^ \] \+ \* \/ \% \~ \,]))]
-   :bnf/mascii [:prod
-                [:seq [:bnf/ascii]]
-                [:list
+   :bnf/mascii [:c/prod
+                [:c/seq [:bnf/ascii]]
+                [:c/list
                  [:bnf/ascii]]]
-   :bnf/masciie [:prod
-                 [:seq [:bnf/asciie]]
-                 [:list
+   :bnf/masciie [:c/prod
+                 [:c/seq [:bnf/asciie]]
+                 [:c/list
                   [:bnf/asciie]]]
-   :bnf/identifier [:prod
-                    [:string \<]
+   :bnf/identifier [:c/prod
+                    [:base/string \<]
                     [:bnf/mascii]
-                    [:string \>]]
-   :bnf/terminal [:prod
-                  [:string \"]
+                    [:base/string \>]]
+   :bnf/terminal [:c/prod
+                  [:base/string \"]
                   [:bnf/masciie]
-                  [:string \"]]
-   :bnf/sep [:prod
-             [:sum
+                  [:base/string \"]]
+   :bnf/sep [:c/prod
+             [:c/sum
               [:space]
               [:tab]
               [:newline]]
-             [:list
-              [:sum
+             [:c/list
+              [:c/sum
                [:space]
                [:tab]
                [:newline]]]]
-   :bnf/sep-l [:list
-               [:sum
+   :bnf/sep-l [:c/list
+               [:c/sum
                 [:space]
                 [:tab]
                 [:newline]]]
-   :bnf/eor (into [:string] "--EOR--")
-   :bnf/bor (into [:string] "--BOR--")
-   :bnf/definition_op (into [:string] "::=")
-   :bnf/alternative_op (into [:string] "::+")
-   :bnf/op [:sum
+   :bnf/eor (into [:base/string] "--EOR--")
+   :bnf/bor (into [:base/string] "--BOR--")
+   :bnf/definition_op (into [:base/string] "::=")
+   :bnf/alternative_op (into [:base/string] "::+")
+   :bnf/op [:c/sum
             [:bnf/definition_op]
             [:bnf/alternative_op]]
-   :bnf/prod [:prod
+   :bnf/prod [:c/prod
               [:bnf/syntactic_unit_alt]
               [:bnf/sep-l]
-              [:sum
+              [:c/sum
                [:bnf/prod]
                [:bnf/syntactic_unit_alt]]]
-   :bnf/sum [:prod
-             [:sum
+   :bnf/sum [:c/prod
+             [:c/sum
               [:bnf/prod]
               [:bnf/syntactic_unit_alt]]
              [:bnf/sep-l]
-             [:string \|]
+             [:base/string \|]
              [:bnf/sep-l]
              [:bnf/syntactic_unit]]
-   :bnf/group [:prod
-               [:string \{]
+   :bnf/group [:c/prod
+               [:base/string \{]
                [:bnf/sep-l]
                [:bnf/syntactic_unit]
                [:bnf/sep-l]
-               [:string \}]]
-   :bnf/opt [:prod
-             [:string \[]
+               [:base/string \}]]
+   :bnf/opt [:c/prod
+             [:base/string \[]
              [:bnf/sep-l]
              [:bnf/syntactic_unit]
              [:bnf/sep-l]
-             [:string \]]]
-   :bnf/star [:string \*]
-   :bnf/rep [:string \+]
-   :bnf/mod [:sum
+             [:base/string \]]]
+   :bnf/star [:base/string \*]
+   :bnf/rep [:base/string \+]
+   :bnf/mod [:c/sum
              [:bnf/star]
              [:bnf/rep]]
-   :bnf/mod_unit [:prod
-                  [:sum
+   :bnf/mod_unit [:c/prod
+                  [:c/sum
                    [:bnf/identifier]
                    [:bnf/terminal]
                    [:bnf/group]
                    [:bnf/opt]]
                   [:bnf/mod]]
-   :bnf/syntactic_unit_alt [:sum
+   :bnf/syntactic_unit_alt [:c/sum
                             [:bnf/mod_unit]
                             [:bnf/identifier]
                             [:bnf/terminal]
                             [:bnf/group]
                             [:bnf/opt]]
-   :bnf/syntactic_unit [:sum
+   :bnf/syntactic_unit [:c/sum
                         [:bnf/sum]
                         [:bnf/prod]
                         [:bnf/syntactic_unit_alt]]
    :bnf/lhs [:bnf/identifier]
    :bnf/rhs [:bnf/syntactic_unit]
-   :bnf/rule [:prod
+   :bnf/rule [:c/prod
               [:bnf/bor]
               [:bnf/sep-l]
               [:bnf/lhs]
@@ -130,21 +130,40 @@
               [:bnf/rhs]
               [:bnf/sep-l]
               [:bnf/eor]]
-   :bnf/rules [:prod
-               [:bnf/sep-l]
-               [:bnf/rule]
-               [:list
-                [:prod
-                 [:bnf/sep-l]
-                 [:bnf/rule]]]
-               [:bnf/sep-l]]})
+   :bnf/rules [:c/list
+               [:c/prod
+                [:bnf/sep-l]
+                [:bnf/rule]
+                [:bnf/sep-l]]]})
 
 (comment
   (in-ns 'parsem.bnf)
   (let [ts (merge type/base-types
-             type/type-combinators
-             type/ast-combinators
-             type/aux-combinators
-             (type/g->types bnf-g))]
-    ((parser/type->p ts [:bnf/rules])
-     (slurp "resources/idl.ebnf"))))
+                  type/type-combinators
+                  type/ast-combinators
+                  type/aux-combinators
+                  (type/g->types type/base-grammar)
+                  (type/g->types type/dtype-grammar)
+                  (type/g->types type/type-grammar)
+                  (type/g->types type/grammar-grammar)
+                  (type/g->types type/parser-grammar)
+                  (type/g->types bnf-g))]
+      (def p1 (parser/type->p ts
+                           [:type/type]))
+      (def p2 (parser/type->p ts
+                           [:parser/parser]))
+      (def p3 (parser/type->p ts
+                         [:grammar/grammar]))
+
+      (p3 (seq bnf-g))
+      #_(def p4 (parser/redp parser/pitem
+                             {:open #{}
+                              :closed #{}}
+                             (fn [acc i]
+                               (mplus (mbind (applyp (pset ) [i])
+                                        (fn [v]
+                                            (munit (conj acc v))))
+                                 (munit acc)))))
+      #_(slurp "resources/idl_sl.ebnf")
+      ((parser/type->p ts [:bnf/rules])
+       (seq (slurp "resources/idl.ebnf")))))

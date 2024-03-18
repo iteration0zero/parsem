@@ -44,13 +44,22 @@
               (rf [type]
                 (mplus (p/applyp (mbind (p/pset #{:c/unit})
                                    (fn [_]
-                                     (munit type)))
+                                     (prn "-> type:" type)
+                                     (mbind (p/applyp (p/typep types)
+                                                      type)
+                                            (fn [v]
+                                                (prn "v unit:" v)
+                                                (mbind v
+                                                       (fn [v]
+                                                           (prn "v unit:" v)
+                                                           (munit v)))))))
                          type)
                   (mbind (p/applyp (p/typep types) type)
                     (fn [v]
+                      (prn "v:" v)
                       (mbind v
-                        (fn [v]
-                          (rf v)))))))
+                             (fn [v]
+                               (munit v)))))))
               (of [type]
                 (mbind (p/applyp (ttp) type)
                   (fn [v]
@@ -58,6 +67,7 @@
                       (fn [s]
                         (rf v))))))]
         (of type)))))
+
 
 (defn bind [types]
   (fn [t f]
@@ -132,6 +142,12 @@
 
 (def dtype-grammar
   {:dtype/keyword [:base/pred keyword?]})
+
+(def to-dtype-combinators
+    {:to-dtype/keyword (fn [_]
+                           (mlet [[:name-seq (fn [_] p/pitem)]]
+                                 (fn [{:keys [name-seq]}]
+                                     (munit (keyword (apply str name-seq))))))})
 
 (defn g->types [g]
   (reduce (fn [acc [k v]]
@@ -236,6 +252,21 @@
       :grammar/rule [:c/prod [:grammar/nt] [:c/filter [:type/type] [:c/seq [:base/item]]]]
       :grammar/grammar [:c/filter [:grammar/rule] [:c/list [:base/item]]]})
 
+(def to-grammar-grammar
+    {:to-grammar/nt [:c/bind [:base/item]
+                     [:c/-> :x
+                      [:c/unit [:to-dtype/keyword :x]]]]
+     :to-grammar/type [:c/bind [:base/item]
+                       [:c/-> :x
+                        [:c/bind [:c/list [:base/item]]
+                         [:c/-> :y
+                          [:c/unit [:c/cons :x :y]]]]]]
+     :to-grammar/rule [:c/bind [:to-grammar/nt]
+                       [:c/-> :x
+                        [:c/bind [:to-grammar/type]
+                         [:c/-> :y
+                          [:c/unit [:c/cons :x :y]]]]]]})
+
 (def parser-grammar
   {:parser/parser [:c/bind [:base/item]
                    [:c/-> :x
@@ -249,29 +280,47 @@
                   type-combinators
                   ast-combinators
                   aux-combinators
+                  to-dtype-combinators
                   (g->types base-grammar)
                   (g->types dtype-grammar)
                   (g->types type-grammar)
                   (g->types grammar-grammar)
-                  (g->types parser-grammar))]
-
+                  (g->types parser-grammar)
+                  (g->types to-grammar-grammar))]
+    (def p0 (p/type->p ts
+              [:c/list [:base/item]]))
     (def p1 (p/type->p ts
               [:type/type]))
     (def p2 (p/type->p ts
               [:parser/parser]))
-    ((ffirst ((mlet [[:v (fn [_] p1)]
-                     [:v (fn [{:keys [v]}]
-                           (p/applyp p2 v))]
-                     [:v (fn [{:keys [v]}]
-                           (p/applyp (p/typep ts) v))]
-                     [:v (fn [{:keys [v]}]
-                           v)]
-                     [:p (fn [{:keys [v]}]
-                           (p/applyp (p/typep ts) v))]]
-                (fn [{:keys [p]}]
-                  (munit p)))
-              [:type/type]))
-     [:parser/parser])))
+    (def p3 (p/type->p ts
+                       [:grammar/grammar]))
+    (def p4 (p/type->p ts
+              [:to-grammar/type]))
+
+    (p4 [:prod [:base/item] [:base/item]])
+
+    #_((mbind (p/applyp (p/typep ts)
+                        (ffirst (p4 [(seq "test") :prod [:base/item] [:base/item]])))
+              (fn [v]
+                  (mbind v
+                         (fn [v]
+                             (munit v)))))
+       [])
+    #_(p4 [(seq "test")])
+    #_((ffirst ((mlet [[:v (fn [_] p1)]
+                       [:v (fn [{:keys [v]}]
+                             (p/applyp p2 v))]
+                       [:v (fn [{:keys [v]}]
+                             (p/applyp (p/typep ts) v))]
+                       [:v (fn [{:keys [v]}]
+                             v)]
+                       [:p (fn [{:keys [v]}]
+                             (p/applyp (p/typep ts) v))]]
+                  (fn [{:keys [p]}]
+                    (munit p)))
+                [:type/type]))
+       [:parser/parser])))
 
 
 
