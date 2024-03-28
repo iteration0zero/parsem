@@ -33,11 +33,11 @@
                           (map char (range 48 57))
                           [\! \? \. \, \- \_ \; \: \= \& \( \) \{ \} \[ \| \| \< \> \^ \] \+ \* \/ \% \~ \,]))]
    :bnf/mascii [:c/prod
-                [:c/seq [:bnf/ascii]]
+                [:bnf/ascii]
                 [:c/list
                  [:bnf/ascii]]]
    :bnf/masciie [:c/prod
-                 [:c/seq [:bnf/asciie]]
+                 [:bnf/asciie]
                  [:c/list
                   [:bnf/asciie]]]
    :bnf/identifier [:c/prod
@@ -140,22 +140,26 @@
   (in-ns 'parsem.bnf)
   (let [ts (merge type/base-types
                   type/type-combinators
-                  type/ast-combinators
                   type/aux-combinators
-                  (type/g->types type/base-grammar)
                   (type/g->types type/dtype-grammar)
                   (type/g->types type/type-grammar)
                   (type/g->types type/grammar-grammar)
                   (type/g->types type/parser-grammar)
-                  (type/g->types bnf-g))]
-      (def p1 (parser/type->p ts
-                           [:type/type]))
-      (def p2 (parser/type->p ts
-                           [:parser/parser]))
-      (def p3 (parser/type->p ts
-                         [:grammar/grammar]))
+                  (type/g->types bnf-g)
+                  (type/g->types type/bnf-to-idl-grammar))]
+      (def p1 (mbind (parser/applyp
+                      (mbind (parser/typep ts)
+                             (fn [v]
+                                 (mbind v
+                                        (fn [v]
+                                            (munit v)))))
+                      [:bnf/identifier])
+                     (fn [v]
+                         (mbind v
+                                (fn [v]
+                                    (munit v))))))
 
-      (p3 (seq bnf-g))
+      (p1 (seq "<definition>"))
       #_(def p4 (parser/redp parser/pitem
                              {:open #{}
                               :closed #{}}
@@ -165,5 +169,5 @@
                                             (munit (conj acc v))))
                                  (munit acc)))))
       #_(slurp "resources/idl_sl.ebnf")
-      ((parser/type->p ts [:bnf/rules])
-       (seq (slurp "resources/idl.ebnf")))))
+      #_((parser/type->p ts [:bnf/rules])
+         (seq (slurp "resources/idl.ebnf")))))

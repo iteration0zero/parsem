@@ -65,12 +65,14 @@
 (defn typep [types]
   (mbind (ppred types)
     (fn [type-name]
-      ((types type-name) types))))
+      (munit ((types type-name) types)))))
 
 (defn type->p [types type]
   (mbind (applyp (typep types) type)
          (fn [v]
-             v)))
+             (mbind v
+                    (fn [v]
+                        (munit v))))))
 
 ;; A parser which returns a list of results of 'parsera',
 ;; possibly empty.
