@@ -5,17 +5,19 @@
 (defn mlet [bnds f]
   (mbind (p/applyp (p/redp p/pitem
                      (munit {})
-                     (fn [acc [k v]]
-                       (munit
-                         (mbind acc
-                           (fn [acc-v]
-                             (mbind (v acc-v)
-                                    (fn [v]
-                                      (munit (assoc acc-v k v)))))))))
+                     (fn [acc]
+                       (fn [[k v]]
+                         (munit
+                           (mbind acc
+                             (fn [acc-v]
+                               (mbind (v acc-v)
+                                      (fn [v]
+                                        (munit (assoc acc-v k v))))))))))
            bnds)
     (fn [v]
       (mbind v
         f))))
+
 
 (comment
   (in-ns 'parsem.util)

@@ -153,7 +153,7 @@
                                  (mbind v
                                         (fn [v]
                                             (munit v)))))
-                      [:bnf/identifier])
+                      [:bnf-to-idl/identifier])
                      (fn [v]
                          (mbind v
                                 (fn [v]

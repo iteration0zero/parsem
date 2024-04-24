@@ -104,7 +104,7 @@
   (mplus
     (mbind parsera
       (fn [value]
-        (mbind (rfp acc value)
+        (mbind ((rfp acc) value)
           (fn [v]
             (redp parsera v rfp)))))
     (munit acc)))
@@ -112,19 +112,21 @@
 (defn filterp [parsera predp]
   (redp parsera
     []
-    (fn [acc i]
-      (mplus (mbind (applyp predp [i])
-               (fn [v]
-                 (munit (conj acc v))))
-        (munit acc)))))
+    (fn [acc]
+      (fn [i]
+        (mplus (mbind (applyp predp [i])
+                 (fn [v]
+                   (munit (conj acc v))))
+          (munit acc))))))
 
 (defn mapp [parsera fp]
   (redp parsera
     []
-    (fn [acc i]
-      (mbind (applyp fp [i])
-        (fn [v]
-          (munit (conj acc v)))))))
+    (fn [acc]
+      (fn [i]
+        (mbind (applyp fp [i])
+          (fn [v]
+            (munit (conj acc v))))))))
 
 (comment
   (in-ns 'parsem.parser)
