@@ -1,7 +1,5 @@
 (ns parsem.bnf
-  (:require [parsem.type :as type]
-            [parsem.parser :as parser]
-            [parsem.setup :refer :all]))
+  (:require [parsem.setup :refer :all]))
 
 (def bnf-g
   {:bnf/alpha [:base/pred
@@ -137,37 +135,4 @@
                 [:bnf/sep-l]]]})
 
 (comment
-  (in-ns 'parsem.bnf)
-  (let [ts (merge type/base-types
-                  type/type-combinators
-                  type/aux-combinators
-                  (type/g->types type/dtype-grammar)
-                  (type/g->types type/type-grammar)
-                  (type/g->types type/grammar-grammar)
-                  (type/g->types type/parser-grammar)
-                  (type/g->types bnf-g)
-                  (type/g->types type/bnf-to-idl-grammar))]
-      (def p1 (mbind (parser/applyp
-                      (mbind (parser/typep ts)
-                             (fn [v]
-                                 (mbind v
-                                        (fn [v]
-                                            (munit v)))))
-                      [:bnf-to-idl/identifier])
-                     (fn [v]
-                         (mbind v
-                                (fn [v]
-                                    (munit v))))))
-
-      (p1 (seq "<definition>"))
-      #_(def p4 (parser/redp parser/pitem
-                             {:open #{}
-                              :closed #{}}
-                             (fn [acc i]
-                               (mplus (mbind (applyp (pset ) [i])
-                                        (fn [v]
-                                            (munit (conj acc v))))
-                                 (munit acc)))))
-      #_(slurp "resources/idl_sl.ebnf")
-      #_((parser/type->p ts [:bnf/rules])
-         (seq (slurp "resources/idl.ebnf")))))
+  (in-ns 'parsem.bnf))

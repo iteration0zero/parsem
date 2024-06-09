@@ -65,14 +65,7 @@
 (defn typep [types]
   (mbind (ppred types)
     (fn [type-name]
-      (munit ((types type-name) types)))))
-
-(defn type->p [types type]
-  (mbind (applyp (typep types) type)
-         (fn [v]
-             (mbind v
-                    (fn [v]
-                        (munit v))))))
+      ((types type-name) types))))
 
 ;; A parser which returns a list of results of 'parsera',
 ;; possibly empty.
@@ -100,33 +93,39 @@
                  (munit (cons value value'))))))
     (munit '())))
 
-(defn redp [parsera acc rfp]
+(defn redp [elemp acc rfp]
   (mplus
-    (mbind parsera
+    (mbind elemp
       (fn [value]
-        (mbind ((rfp acc) value)
-          (fn [v]
-            (redp parsera v rfp)))))
+        (mbind (applyp rfp [acc])
+               (fn [rfp']
+                 (mbind (applyp rfp' [value])
+                        (fn [value']
+                          (redp elemp value' rfp)))))))
     (munit acc)))
 
-(defn filterp [parsera predp]
-  (redp parsera
+(defn filterp [elemp predp]
+  (redp elemp
     []
-    (fn [acc]
-      (fn [i]
-        (mplus (mbind (applyp predp [i])
-                 (fn [v]
-                   (munit (conj acc v))))
-          (munit acc))))))
+    (mbind pitem
+           (fn [acc]
+             (munit (mbind pitem
+                           (fn [value]
+                             (mplus (mbind (applyp predp [value])
+                                           (fn [value]
+                                             (munit (conj acc value))))
+                                    (munit acc)))))))))
 
 (defn mapp [parsera fp]
   (redp parsera
     []
-    (fn [acc]
-      (fn [i]
-        (mbind (applyp fp [i])
-          (fn [v]
-            (munit (conj acc v))))))))
+    (mbind pitem
+           (fn [acc]
+             (munit (mbind pitem
+                           (fn [value]
+                             (mbind (applyp fp [value])
+                                    (fn [value]
+                                      (munit (conj acc value)))))))))))
 
 (comment
   (in-ns 'parsem.parser)
