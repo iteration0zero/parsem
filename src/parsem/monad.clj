@@ -1,6 +1,4 @@
-(ns parsem.monad
-  (:require [clojure.spec.alpha :as spec])
-  (:import (clojure.lang ISeq)))
+(ns parsem.monad)
 
 (defprotocol IMonad
   (unit [_ a])
@@ -49,37 +47,29 @@
     IMonad
     (unit [_ a]
       (fn [s]
-          (if (sequential? s)
-            (unit m [a s])
-            (zero m))))
+          (unit m [a s])))
     (bind [_ a f]
       (fn [s]
-        (if (sequential? s)
-          (bind m
-            (a s)
-            (fn [[v s']]
-              ((f v) s')))
-          (zero m))))
+        (bind m
+          (a s)
+          (fn [[v s']]
+            ((f v) s')))))
     IMonadZeroPlus
     (zero [_]
       (fn [s]
         (zero m)))
     (plus [_ a b]
       (fn [s]
-        (if (sequential? s)
-          (plus m
-                (a s)
-                (b s))
-          (zero m))))
+        (plus m
+              (a s)
+              (b s))))
     IMonadDetPlus
     (dplus [this a b]
       (fn [s]
-        (if (sequential? s)
-          (let [r (a s)]
-            (if (= ((zero this) s) r)
-              (b s)
-              r))
-          (zero m))))
+        (let [r (a s)]
+          (if (= ((zero this) s) r)
+            (b s)
+            r))))
     IMonadStateOp
     (mfetch [this]
       (mupdate this identity))
@@ -87,8 +77,13 @@
       (mupdate this (fn [_] s)))
     (mupdate [_ f]
       (fn [s]
-        (if (sequential? s)
-          (if (f s)
-            (unit m [s (f s)])
-            (zero m))
+        (if-let [v (f s)]
+          (unit m [s v])
           (zero m))))))
+
+
+
+
+
+
+

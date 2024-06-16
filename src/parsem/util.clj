@@ -1,6 +1,9 @@
 (ns parsem.util
   (:require [parsem.setup :refer :all]
-            [parsem.parser :as p]))
+            [parsem.parser :as p]
+            [parsem.monad :as m]
+            [parsem.setup :as setup]
+            [parsem.sequence :as sequence]))
 
 (defn mlet [bnds f]
   (mbind (p/applyp (p/redp p/pitem

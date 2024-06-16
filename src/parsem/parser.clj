@@ -1,14 +1,22 @@
 (ns parsem.parser
-  (:require [parsem.setup :refer :all]))
+  (:require [parsem.sequence :as s]
+            [parsem.setup :refer :all]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PARSERS                                               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn empty-check [f]
-    (fn [s]
-        (if (not (empty? s))
-            (f s))))
+(def sequence-check
+  (mplus (update-s (fn [s]
+                     (if (satisfies? s/ISequence s)
+                       s)))
+         (update-s (fn [s]
+                     (s/create-sequence s)))))
+
+(def eos-check
+  (update-s (fn [s]
+              (if (not (s/eos? s))
+                s))))
 
 ;; Takes a parser and an input sequence
 ;; and returns a parser which uses the monadic state operations mfetch and mset
@@ -28,8 +36,12 @@
 
 ;; A parser which consumes one item of an input sequence.
 (def pitem
-  (mbind (update-s (empty-check rest))
-         (comp munit first)))
+  (mbind sequence-check
+         (fn [_]
+           (mbind eos-check
+                  (fn [_]
+                    (mbind (update-s rest)
+                           (comp munit s/first)))))))
 
 ;; A parser which checks if an item is contained in a set.
 (defn pset [set]
@@ -62,10 +74,10 @@
 ;; A parser which takes
 ;; an association 'types' of 'type-name' -> 'types' -> 'type-parser'
 ;; and returns the respective 'type-parser'.
-(defn typep [types]
-  (mbind (ppred types)
+(defn typep [ctx]
+  (mbind (ppred ctx)
     (fn [type-name]
-      ((types type-name) types))))
+      ((-> ctx type-name :tfn) ctx))))
 
 ;; A parser which returns a list of results of 'parsera',
 ;; possibly empty.
@@ -129,11 +141,6 @@
 
 (comment
   (in-ns 'parsem.parser)
-  ((mapp pitem
-     (mbind pitem
-       (fn [v]
-         (munit v))))
-   "test")
   (let [ts (types base-types)
         ts (types ts type-combinators)
         gts (g->types ts test-g)]

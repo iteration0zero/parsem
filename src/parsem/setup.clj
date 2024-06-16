@@ -1,5 +1,6 @@
 (ns parsem.setup
-  (:require [parsem.monad :as m]))
+  (:require [parsem.monad :as m]
+            [parsem.sequence :as s]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SETUP                                                 ;;
@@ -7,7 +8,8 @@
 
 ;; Defines the parser monad as the parameterised state monad
 ;; by the seq/list monad.
-;; Therefore defines parsers as stateful, non-deterministic computations.
+;; Defines the sequence check monad as the exception monad.
+;; Therefore defines parsers as stateful, non-deterministic computations operating on sequences.
 (def parser-monad (m/mstatep m/mseq))
 
 ;; Monadic operations
